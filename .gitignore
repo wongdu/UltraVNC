@@ -62,3 +62,20 @@ winvnc/omnithread/Release/
 vncviewer/Release/
 repeater/.vs/
 winvnc/winvnc/VTune Profiler Results/
+addon/ms-logon/authadm/Debug/
+addon/ms-logon/authSSP/Debug/
+addon/ms-logon/ldapauth9x/Debug/
+addon/ms-logon/ldapauth/Debug/
+addon/ms-logon/ldapauthNT4/Debug/
+
+addon/ms-logon/logging/Debug/
+addon/ms-logon/MSLogonACL/Debug/
+addon/ms-logon/testauth/Debug/
+addon/ms-logon/workgrpdomnt4/Debug/
+
+avilog/avilog/Debug/
+setcad/setcad/Debug/
+setpasswd/setpasswd/Debug/
+uvnc_settings2/uvnc_settings/Debug/
+winvnc/vnchooks/Debug/
+buildtime.h
