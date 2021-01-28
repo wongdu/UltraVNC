@@ -4815,12 +4815,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
 	}
 }
 
-//
-// SendKeyEvent
-//
-
-inline void
-ClientConnection::SendKeyEvent(CARD32 key, bool down)
+inline void ClientConnection::SendKeyEvent(CARD32 key, bool down)
 {
 	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
@@ -4836,10 +4831,6 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key,
       //  down ? _T("down") : _T("up"),ke.key);
 }
-
-//
-// SendClientCutText
-//
 
 void ClientConnection::SendClientCutText(char *str, int len)
 {
