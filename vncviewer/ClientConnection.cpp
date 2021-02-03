@@ -1236,14 +1236,13 @@ void ClientConnection::GTGBS_CreateToolbar()
 					NULL);
 	helper::SafeSetWindowUserData(m_hwndTBwin, (LONG_PTR)this);
 	ShowWindow(m_hwndTBwin, SW_HIDE);
-	//////////////////////////////////////////////////
+
 	if ((clr.right-clr.left)>140+85+14*24)
 		CreateButtons(false,m_fServerKnowsFileTransfer);
 	else
 		CreateButtons(true,m_fServerKnowsFileTransfer);
-	//////////////////////////////////////////////////
-	RECT r;
 
+	RECT r;
 	GetClientRect(m_hwndTBwin,&r);
 	/*m_TrafficMonitor = CreateWindowEx(WS_EX_NOPARENTNOTIFY | WS_EX_CLIENTEDGE,
 											"Static",
@@ -1272,7 +1271,6 @@ void ClientConnection::GTGBS_CreateToolbar()
 		ReleaseDC(m_TrafficMonitor,hdc);
 	}
 
-	///////////////////////////////////////////////////
 	m_logo_wnd = CreateWindow(
 									"combobox",
 									"",
@@ -1313,7 +1311,6 @@ void ClientConnection::GTGBS_CreateToolbar()
     SendMessage(m_logo_wnd, CB_SETCURSEL, 0, 0);
 	if (m_pMRU) delete m_pMRU;
 }
-//////////////////////////////////////////////////////////
 
 void ClientConnection::CreateDisplay()
 {
@@ -4094,7 +4091,6 @@ void ClientConnection::SetFormatAndEncodings()
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingGII);
 #endif
 
-
     // sf@2002 - DSM Plugin
 	int nEncodings = se->nEncodings;
 	se->nEncodings = Swap16IfLE(se->nEncodings);
@@ -4102,6 +4098,7 @@ void ClientConnection::SetFormatAndEncodings()
 
 	WriteExact((char *)buf, sz_rfbSetEncodingsMsg + sizeof(CARD32) * nEncodings, rfbSetEncodings);
 }
+
 void ClientConnection::Createdib()
 {
 	omni_mutex_lock l(m_bitmapdcMutex);
@@ -4135,7 +4132,6 @@ void ClientConnection::Createdib()
 
 	{
 		ObjectSelector bb(m_hmemdc, m_membitmap);
-
 		if (m_myFormat.bitsPerPixel==8 && m_myFormat.trueColour)
 		{
 			struct Colour {
@@ -4188,6 +4184,7 @@ void ClientConnection::Createdib()
 					}
 			}
 }
+
 // Closing down the connection.
 // Close the socket, kill the thread.
 void ClientConnection::KillThread()
@@ -4576,7 +4573,7 @@ inline bool ClientConnection::ProcessPointerEvent(int x, int y, DWORD keyflags, 
 			}
 			else
 			{
-				// just send event noramlly
+				// just send event normally
 				SubProcessPointerEvent(x, y, keyflags);
 			}
 		}
@@ -4601,7 +4598,6 @@ bool ClientConnection::FlushThrottledMouseMove()
 		m_PendingMouseMove.dwLastSentMouseMove = GetTickCount();
 
 		SubProcessPointerEvent(m_PendingMouseMove.x, m_PendingMouseMove.y, m_PendingMouseMove.keyflags);
-
 		return true;
 	}
 
@@ -4645,7 +4641,6 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 		}
 
 		SendPointerEvent(x_scaled, y_scaled, mask);
-
 		if ((short)HIWORD(keyflags) != 0) {
 			// Immediately send a "button-up" after mouse wheel event.
 			mask &= !(rfbButton4Mask | rfbButton5Mask);
@@ -4675,33 +4670,33 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
   }
 }
 
-//
-// SendPointerEvent.
-//
-
-inline void
-ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
+inline void ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 {
-	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
-	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
+	if (m_pFileTransfer->m_fFileTransferRunning && 
+		( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) 
+		return;
+	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible)
+		return;
 
 	//omni_mutex_lock l(m_UpdateMutex);
 
 	/*
 	newtick=GetTickCount();
-	if ((newtick-oldtick)<100) return;
+	if ((newtick-oldtick)<100) 
+		return;
 	oldtick=newtick;
 	*/
 
 	rfbPointerEventMsg pe;
-
     oldPointerX = x;
     oldPointerY = y;
     oldButtonMask = buttonMask;
     pe.type = rfbPointerEvent;
     pe.buttonMask = buttonMask;
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
+    if (x < 0) 
+		x = 0;
+    if (y < 0) 
+		y = 0;
 	// tight cursor handling
 	SoftCursorMove(x, y);
     pe.x = Swap16IfLE(x);
@@ -4710,9 +4705,6 @@ ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 	WriteExactQueue_timeout((char *)&pe, sz_rfbPointerEventMsg, rfbPointerEvent,5); // sf@2002 - For DSM Plugin
 }
 
-//
-// ProcessKeyEvent
-//
 // Normally a single Windows key event will map onto a single RFB
 // key message, but this is not always the case.  Much of the stuff
 // here is to handle AltGr (=Ctrl-Alt) on international keyboards.
@@ -5209,16 +5201,16 @@ void* ClientConnection::run_undetached(void* arg) {
                 case rfbNotifyPluginStreaming:
                     if (sz_rfbNotifyPluginStreamingMsg > 1)
                     {
-                  	rfbNotifyPluginStreamingMsg nspm;
-                	ReadExact(((char *) &nspm)+m_nTO, sz_rfbNotifyPluginStreamingMsg-m_nTO);
+                  		rfbNotifyPluginStreamingMsg nspm;
+                		ReadExact(((char *) &nspm)+m_nTO, sz_rfbNotifyPluginStreamingMsg-m_nTO);
                     }
 					m_fPluginStreamingIn = true;
 					PostMessage(m_hwndcn, WM_NOTIFYPLUGINSTREAMING, NULL, NULL);
                     break;
 				default:
-						  vnclog.Print(3, _T("Unknown message type x%02x\n"), msgType );
-						  throw WarningException(sz_L64);
-						  break;
+					vnclog.Print(3, _T("Unknown message type x%02x\n"), msgType );
+					throw WarningException(sz_L64);
+					break;
 
 				/*
 				default:
@@ -5274,7 +5266,6 @@ void* ClientConnection::run_undetached(void* arg) {
 			else if ((strcmp(e.str(),"rdr::SystemException: read: Unknown error (10054)")==NULL) && !m_bClosedByUser)
 			{
 				//ErrorException w(sz_L94,200);
-
 				if (m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning)
 				{
 					SetEvent(KillEvent);
@@ -5307,7 +5298,7 @@ void* ClientConnection::run_undetached(void* arg) {
 	vnclog.Print(4, _T("Update-processing thread finishing\n") );
 	SetEvent(KillEvent);
 	SetEvent(KillUpdateThreadEvent);
-		// sf@2002
+
 	m_pFileTransfer->m_fFileTransferRunning = false;
 	m_pTextChat->m_fTextChatRunning = false;
 	return this;
@@ -5386,7 +5377,6 @@ void ClientConnection::Internal_SendFullFramebufferUpdateRequest()
     Internal_SendFramebufferUpdateRequest(0, 0, m_si.framebufferWidth,
 			m_si.framebufferHeight, false);
 }
-
 
 void ClientConnection::Internal_SendAppropriateFramebufferUpdateRequest()
 {
@@ -5476,8 +5466,7 @@ bool ClientConnection::SendServerInput(BOOL enabled)
 {
     rfbSetServerInputMsg sim;
 	memset(&sim, 0, sizeof(sim));
-
-
+	
     sim.type = rfbSetServerInput;
     sim.status = enabled;
 
@@ -5912,7 +5901,8 @@ inline void ClientConnection::ReadScreenUpdate()
 					Sleep(200);
 					ii++;
 				}
-				else break;
+				else
+					break;
 			}
 			vnclog.Print(0, _T("Buffer cleared, sync should be back OK..Continue \n"));
 			Recover_from_sync=true;
@@ -6185,6 +6175,7 @@ void ClientConnection::ReadBell()
 	}
 	vnclog.Print(6, _T("Bell!\n"));
 }
+
 void ClientConnection::ReadServerState()
 {
     rfbServerStateMsg ss;
@@ -6766,7 +6757,8 @@ void ClientConnection::WriteExactQueue_timeout(char *buf, int bytes, CARD8 msgTy
 //adzm 2010-09
 void ClientConnection::WriteTransformed_timeout(char *buf, int bytes,int timeout, bool bQueue)
 {
-	if (bytes == 0) return;
+	if (bytes == 0)
+		return;
 
 	omni_mutex_lock l(m_writeMutex);
 	//vnclog.Print(10, _T("  writing %d bytes\n"), bytes);
@@ -6853,7 +6845,8 @@ void ClientConnection::CheckZipBufferSize(int bufsize)
 
 	unsigned char *newbuf;
 
-	if (m_zipbufsize > bufsize) return;
+	if (m_zipbufsize > bufsize)
+		return;
 
 	omni_mutex_lock l(m_ZipBufferMutex);
 
@@ -6863,7 +6856,6 @@ void ClientConnection::CheckZipBufferSize(int bufsize)
 	}
 
 	// Only if we're successful...
-
 	if (m_zipbuf != NULL)
 		delete [] m_zipbuf;
 	m_zipbuf = newbuf;
@@ -6881,7 +6873,8 @@ void ClientConnection::CheckFileZipBufferSize(int bufsize)
 
 	unsigned char *newbuf;
 
-	if (m_filezipbufsize > bufsize) return;
+	if (m_filezipbufsize > bufsize)
+		return;
 
 	omni_mutex_lock l(m_FileZipBufferMutex);
 
@@ -6891,7 +6884,6 @@ void ClientConnection::CheckFileZipBufferSize(int bufsize)
 	}
 
 	// Only if we're successful...
-
 	if (m_filezipbuf != NULL)
 		delete [] m_filezipbuf;
 	m_filezipbuf = newbuf;
@@ -6909,7 +6901,8 @@ void ClientConnection::CheckFileChunkBufferSize(UINT bufsize)
 
 	unsigned char *newbuf;
 
-	if (m_filechunkbufsize > bufsize) return;
+	if (m_filechunkbufsize > bufsize)
+		return;
 
 	omni_mutex_lock l(m_FileChunkBufferMutex);
 
@@ -7138,9 +7131,6 @@ void ClientConnection::GetFriendlySizeString(__int64 Size, char* szText)
 	}
 }
 
-//
-// sf@2002
-//
 void ClientConnection::UpdateStatusFields()
 {
 	char szText[256];
@@ -8682,218 +8672,211 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 #pragma warning(disable : 4101)
 }
 
-//
-//
-//
 LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
     ClientConnection *_this = helper::SafeGetWindowUserData<ClientConnection>(hwnd);
 
-    if (_this == NULL) return DefWindowProc(hwnd, iMsg, wParam, lParam);
+    if (_this == NULL) 
+		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
 	HWND parent;
 	if (_this->m_opts.m_ShowToolbar==true)
+	{
+		parent = _this->m_hwndMain;
+		switch (iMsg)
 		{
-			parent = _this->m_hwndMain;
-			switch (iMsg)
+		case WM_PAINT:
 			{
-			case WM_PAINT:
-				{
-					if (_this->m_logo_wnd)
-						{
-						/*HDC hdcX,hdcBits;
-						hdcX = GetDC(_this->m_logo_wnd);
-						hdcBits = CreateCompatibleDC(hdcX);
-						SelectObject(hdcBits,_this->m_logo_min);
-						BitBlt(hdcX,0,0,70,28,hdcBits,0,0,SRCCOPY);
-						DeleteDC(hdcBits);
-						ReleaseDC(_this->m_logo_wnd,hdcX);*/
-						UpdateWindow(_this->m_logo_wnd);
-						}
-					break;
-				}
+				if (_this->m_logo_wnd)
+					{
+					/*HDC hdcX,hdcBits;
+					hdcX = GetDC(_this->m_logo_wnd);
+					hdcBits = CreateCompatibleDC(hdcX);
+					SelectObject(hdcBits,_this->m_logo_min);
+					BitBlt(hdcX,0,0,70,28,hdcBits,0,0,SRCCOPY);
+					DeleteDC(hdcBits);
+					ReleaseDC(_this->m_logo_wnd,hdcX);*/
+					UpdateWindow(_this->m_logo_wnd);
+					}
+				break;
+			}
 
-			case WM_COMMAND:
-				if (LOWORD(wParam) == ID_BUTTON_INFO)
-				{
-					if (IsWindow(_this->m_hwndStatus)){
-						if (_this->m_hwndStatus)SetForegroundWindow(_this->m_hwndStatus);
-						if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus, SW_NORMAL);
+		case WM_COMMAND:
+			if (LOWORD(wParam) == ID_BUTTON_INFO)
+			{
+				if (IsWindow(_this->m_hwndStatus)){
+					if (_this->m_hwndStatus)SetForegroundWindow(_this->m_hwndStatus);
+					if (_this->m_hwndStatus)ShowWindow(_this->m_hwndStatus, SW_NORMAL);
+				}else{
+					SECURITY_ATTRIBUTES   lpSec;
+					DWORD				  threadID;
+					if (_this->m_statusThread) CloseHandle(_this->m_statusThread);
+					_this->m_statusThread = NULL;
+					_this->m_statusThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE )ClientConnection::GTGBS_ShowStatusWindow,(LPVOID)_this,0,&threadID);
+				}
+				return 0;
+			}
+			if (LOWORD(wParam) ==9998)
+			{
+				vnclog.Print(0,_T("CLICKK %d\n"),HIWORD(wParam));
+				switch (HIWORD(wParam)) {
+					case 0:
+							{
+							int port;
+							TCHAR fulldisplay[256];
+							TCHAR display[256];
+							GetDlgItemText(hwnd, 9999, display, 256);
+							_tcscpy_s(fulldisplay, display);
+							vnclog.Print(0,_T("CLICKK %s\n"),fulldisplay);
+							ParseDisplay(fulldisplay, display, 256, &port);
+							if (strcmp(display, "ID") == 0) {
+								return TRUE;
+							}
+							_this->m_pApp->NewConnection(false,display,port);
+							}
+					}
+				break;
+
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_SEP)
+			{
+				UINT Key;
+				//_this->SendKeyEvent(XK_Execute,     true);
+				//_this->SendKeyEvent(XK_Execute,     false);
+				Key = DialogBox(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_CUSTUM_KEY),NULL,(DLGPROC)ClientConnection::GTGBS_SendCustomKey_proc);
+				if (Key>0){
+					vnclog.Print(0,_T("START Send Custom Key %d\n"),Key);
+					if ( (Key & KEYMAP_LALT_FLAG) == KEYMAP_LALT_FLAG){
+						_this->SendKeyEvent(XK_Alt_L,true);
+						_this->SendKeyEvent(Key ^ KEYMAP_LALT_FLAG,true);
+						_this->SendKeyEvent(Key ^ KEYMAP_LALT_FLAG,false);
+						_this->SendKeyEvent(XK_Alt_L,false);
+					}else if ( (Key & KEYMAP_RALT_FLAG) ==KEYMAP_RALT_FLAG){
+						_this->SendKeyEvent(XK_Alt_R,true);
+						_this->SendKeyEvent(XK_Control_R,true);
+						_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,true);
+						_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,false);
+						_this->SendKeyEvent(XK_Alt_R,false);
+						_this->SendKeyEvent(XK_Control_R,false);
+					}else if ( (Key &  KEYMAP_RCONTROL_FLAG) == KEYMAP_RCONTROL_FLAG){
+						_this->SendKeyEvent(XK_Control_R,true);
+						_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,true);
+						_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,false);
+						_this->SendKeyEvent(XK_Control_R,false);
 					}else{
-						SECURITY_ATTRIBUTES   lpSec;
-						DWORD				  threadID;
-						if (_this->m_statusThread) CloseHandle(_this->m_statusThread);
-						_this->m_statusThread = NULL;
-						_this->m_statusThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE )ClientConnection::GTGBS_ShowStatusWindow,(LPVOID)_this,0,&threadID);
+						_this->SendKeyEvent(Key,true);
+						_this->SendKeyEvent(Key,false);
 					}
-					return 0;
+
+					//adzm 2010-09
+					_this->FlushWriteQueue(true, 5);
+
+					vnclog.Print(0,_T("END   Send Custom Key %d\n"),Key);
 				}
-				if (LOWORD(wParam) ==9998)
+				SetForegroundWindow(_this->m_hwndcn);
+
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_END )
+			{
+				SendMessage(parent,WM_CLOSE,(WPARAM)0,(LPARAM)0);
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_CAD )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_CTLALTDEL,(LPARAM)0);
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_FULLSCREEN )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_FULLSCREEN,(LPARAM)0);
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_FTRANS )
+			{
+				if (_this->m_pFileTransfer->m_fFileTransferRunning)
 				{
-					vnclog.Print(0,_T("CLICKK %d\n"),HIWORD(wParam));
-					switch (HIWORD(wParam)) {
-						case 0:
-								{
-								int port;
-								TCHAR fulldisplay[256];
-								TCHAR display[256];
-								GetDlgItemText(hwnd, 9999, display, 256);
-								_tcscpy_s(fulldisplay, display);
-								vnclog.Print(0,_T("CLICKK %s\n"),fulldisplay);
-								ParseDisplay(fulldisplay, display, 256, &port);
-								if (strcmp(display, "ID") == 0) {
-									return TRUE;
-								}
-								_this->m_pApp->NewConnection(false,display,port);
-								}
-						}
-					break;
-
+					_this->m_pFileTransfer->ShowFileTransferWindow(true);
 				}
+				else
+					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_FILETRANSFER,(LPARAM)0);
+				return 0;
+			}
 
-				if (LOWORD(wParam) == ID_BUTTON_SEP)
+			if (LOWORD(wParam) == ID_BUTTON_DBUTTON )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DBUTTON,(LPARAM)0);
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_SW )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_SW,(LPARAM)0);
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_DESKTOP )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DESKTOP,(LPARAM)0);
+				return 0;
+			}
+
+			if (LOWORD(wParam) == ID_BUTTON_TEXTCHAT )
+			{
+				if (_this->m_pTextChat->m_fTextChatRunning)
 				{
-					UINT Key;
-					//_this->SendKeyEvent(XK_Execute,     true);
-					//_this->SendKeyEvent(XK_Execute,     false);
-					Key = DialogBox(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_CUSTUM_KEY),NULL,(DLGPROC)ClientConnection::GTGBS_SendCustomKey_proc);
-					if (Key>0){
-						vnclog.Print(0,_T("START Send Custom Key %d\n"),Key);
-						if ( (Key & KEYMAP_LALT_FLAG) == KEYMAP_LALT_FLAG){
-							_this->SendKeyEvent(XK_Alt_L,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_LALT_FLAG,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_LALT_FLAG,false);
-							_this->SendKeyEvent(XK_Alt_L,false);
-						}else if ( (Key & KEYMAP_RALT_FLAG) ==KEYMAP_RALT_FLAG){
-							_this->SendKeyEvent(XK_Alt_R,true);
-							_this->SendKeyEvent(XK_Control_R,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RALT_FLAG,false);
-							_this->SendKeyEvent(XK_Alt_R,false);
-							_this->SendKeyEvent(XK_Control_R,false);
-						}else if ( (Key &  KEYMAP_RCONTROL_FLAG) == KEYMAP_RCONTROL_FLAG){
-							_this->SendKeyEvent(XK_Control_R,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,true);
-							_this->SendKeyEvent(Key ^ KEYMAP_RCONTROL_FLAG,false);
-							_this->SendKeyEvent(XK_Control_R,false);
-						}else{
-							_this->SendKeyEvent(Key,true);
-							_this->SendKeyEvent(Key,false);
-						}
-
-						//adzm 2010-09
-						_this->FlushWriteQueue(true, 5);
-
-						vnclog.Print(0,_T("END   Send Custom Key %d\n"),Key);
-					}
-					SetForegroundWindow(_this->m_hwndcn);
-
-					return 0;
+					_this->m_pTextChat->ShowChatWindow(true);
 				}
+				else
+					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_TEXTCHAT,(LPARAM)0);
+				return 0;
+			}
 
-				if (LOWORD(wParam) == ID_BUTTON_END )
+			if (LOWORD(wParam) == ID_BUTTON_DINPUT )
+			{
+				if (_this->m_remote_mouse_disable)
 				{
-					SendMessage(parent,WM_CLOSE,(WPARAM)0,(LPARAM)0);
-					return 0;
+					_this->m_remote_mouse_disable=false;
+					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_INPUT,(LPARAM)0);
+					SendMessage(parent,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 				}
-
-				if (LOWORD(wParam) == ID_BUTTON_CAD )
+				else
 				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_CTLALTDEL,(LPARAM)0);
-					return 0;
+					_this->m_remote_mouse_disable=true;
+					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DINPUT,(LPARAM)0);
+					SendMessage(parent,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
 				}
+				return 0;
+			}
 
-				if (LOWORD(wParam) == ID_BUTTON_FULLSCREEN )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_FULLSCREEN,(LPARAM)0);
-					return 0;
-				}
+			if (LOWORD(wParam) == ID_BUTTON_PROPERTIES )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)IDC_OPTIONBUTTON,(LPARAM)0);
+				return 0;
+			}
 
-				if (LOWORD(wParam) == ID_BUTTON_FTRANS )
-				{
-					if (_this->m_pFileTransfer->m_fFileTransferRunning)
-					{
-						_this->m_pFileTransfer->ShowFileTransferWindow(true);
-					}
-					else
-						SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_FILETRANSFER,(LPARAM)0);
-					return 0;
-				}
+			if (LOWORD(wParam) == ID_BUTTON_REFRESH )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_REQUEST_REFRESH,(LPARAM)0);
+				return 0;
+			}
 
-				if (LOWORD(wParam) == ID_BUTTON_DBUTTON )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DBUTTON,(LPARAM)0);
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_SW )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_SW,(LPARAM)0);
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_DESKTOP )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DESKTOP,(LPARAM)0);
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_TEXTCHAT )
-				{
-					if (_this->m_pTextChat->m_fTextChatRunning)
-					{
-						_this->m_pTextChat->ShowChatWindow(true);
-					}
-					else
-						SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_TEXTCHAT,(LPARAM)0);
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_DINPUT )
-				{
-					if (_this->m_remote_mouse_disable)
-					{
-						_this->m_remote_mouse_disable=false;
-						SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_INPUT,(LPARAM)0);
-						SendMessage(parent,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
-					}
-					else
-					{
-						_this->m_remote_mouse_disable=true;
-						SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_DINPUT,(LPARAM)0);
-						SendMessage(parent,WM_SIZE,(WPARAM)ID_DINPUT,(LPARAM)0);
-					}
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_PROPERTIES )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)IDC_OPTIONBUTTON,(LPARAM)0);
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_REFRESH )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_REQUEST_REFRESH,(LPARAM)0);
-					return 0;
-				}
-
-				if (LOWORD(wParam) == ID_BUTTON_STRG_ESC )
-				{
-					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_CTLESC,(LPARAM)0);
-					return 0;
-				}
+			if (LOWORD(wParam) == ID_BUTTON_STRG_ESC )
+			{
+				SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_CTLESC,(LPARAM)0);
+				return 0;
 			}
 		}
-return DefWindowProc(hwnd, iMsg, wParam, lParam);
+	}
+	return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
-
-
 static bool mouse_enable = true;
-//
-//
-//
 LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	//	HWND parent;
@@ -9024,7 +9007,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 					if (_this->BumpScroll(x, y))
 						return 0;
 				}
-				if (_this->m_opts.m_ViewOnly) return 0;
+				if (_this->m_opts.m_ViewOnly)
+					return 0;
 #ifdef _Gii
 				//Filter touch/pen events
 				if(_this->mytouch->TouchActivated()==true) {
@@ -9034,7 +9018,8 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						return 0;
 					}
 				}
-				if (mouse_enable != true) return 0;
+				if (mouse_enable != true)
+					return 0;
 #endif
 					//adzm 2010-09
 						if (_this->ProcessPointerEvent(x,y, wParam, iMsg)) {
@@ -9639,7 +9624,6 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
     }
 }
 
-//adzm 2010-09 -
 ClientConnection::PendingMouseMove::PendingMouseMove()
 	: dwLastSentMouseMove(0),
 	x(0),

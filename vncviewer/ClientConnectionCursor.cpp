@@ -170,7 +170,6 @@ void ClientConnection::ReadCursorPos(rfbFramebufferUpdateRectHeader *pfburh)
 //
 
 void ClientConnection::SoftCursorLockArea(int x, int y, int w, int h) {
-
 	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	if (!prevCursorSet)
@@ -227,7 +226,6 @@ void ClientConnection::SoftCursorUnlockScreen() {
 //
 
 void ClientConnection::SoftCursorMove(int x, int y) {
-
 	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
 
 	if (prevCursorSet && !rcCursorHidden) {
